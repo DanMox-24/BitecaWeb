@@ -1,0 +1,197 @@
+﻿@model IEnumerable<IGrouping<string, BibliotecaWeb.Models.Libro>>
+
+@{
+    ViewData["Title"] = "Biblioteca Virtual";
+}
+
+<div class="section-header fade-in">
+    <h1 class="section-title">
+        <i class="fas fa-tablet-alt me-3"></i>
+        Biblioteca Virtual
+    </h1>
+    <p class="section-subtitle">
+        Explora nuestra colección digital con acceso inmediato a miles de recursos
+    </p>
+</div>
+
+@foreach (var grupo in Model)
+{
+    <div class="category-section fade-in">
+        @{
+            var iconoCategoria = "";
+            var descripcionCategoria = "";
+            switch (grupo.Key)
+            {
+                case "E-libro":
+                    iconoCategoria = "fas fa-book-reader";
+                    descripcionCategoria = "Libros digitales para descarga y lectura offline";
+                    break;
+                case "Bibliotecas Publicas":
+                    iconoCategoria = "fas fa-building";
+                    descripcionCategoria = "Acceso a colecciones de bibliotecas públicas digitales";
+                    break;
+                case "Online":
+                    iconoCategoria = "fas fa-globe";
+                    descripcionCategoria = "Recursos en línea de acceso directo";
+                    break;
+                default:
+                    iconoCategoria = "fas fa-book";
+                    descripcionCategoria = "Recursos digitales diversos";
+                    break;
+            }
+        }
+
+        <h2 class="category-title">
+            <i class="@iconoCategoria"></i>
+            @grupo.Key
+        </h2>
+        <p class="text-muted mb-4">@descripcionCategoria</p>
+
+        <div class="row">
+            @foreach (var libro in grupo)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="book-card">
+                        <div class="book-image">
+                            @if (!string.IsNullOrEmpty(libro.ImagenUrl))
+                            {
+                                <img src="@libro.ImagenUrl" alt="@libro.Titulo" class="img-fluid" style="width: 100%; height: 200px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <i class="@iconoCategoria"></i>
+                            }
+                        </div>
+                        <div class="book-content">
+                            <h5 class="book-title">@libro.Titulo</h5>
+                            <p class="book-author">
+                                <i class="fas fa-user me-2"></i>@libro.Autor
+                            </p>
+                            @if (libro.Categoria != null)
+                            {
+                                <span class="book-category">@libro.Categoria.Nombre</span>
+                            }
+                            @if (!string.IsNullOrEmpty(libro.Descripcion))
+                            {
+                                <p class="mt-3 text-muted">
+                                    @if (libro.Descripcion.Length > 100)
+                                    {
+                                        @(libro.Descripcion.Substring(0, 100) + "...")
+                                    }
+                                    else
+                                    {
+                                        @libro.Descripcion
+                                    }
+                                </p>
+                            }
+                            <div class="mt-3">
+                                <span class="book-status status-disponible">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Disponible Online
+                                </span>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-primary btn-sm" onclick="abrirRecursoVirtual('@libro.Id', '@libro.Titulo')">
+                                    <i class="fas fa-external-link-alt me-2"></i>
+                                    Acceder
+                                </button>
+                                <a href="@Url.Action("DetalleLibro", "Biblioteca", new { id = libro.Id })" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No hay recursos virtuales disponibles</h4>
+        <p class="text-muted">Los recursos digitales estarán disponibles próximamente.</p>
+    </div>
+}
+
+<!-- Modal para acceso a recursos virtuales -->
+<div class="modal fade" id="modalRecursoVirtual" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-external-link-alt me-2"></i>
+                    Acceso a Recurso Digital
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-tablet-alt fa-3x text-primary mb-3"></i>
+                    <h6 id="tituloRecurso"></h6>
+                    <p class="text-muted">Estás accediendo a un recurso digital de nuestra biblioteca.</p>
+
+                    @if (Context.Session.GetString("UsuarioId") != null)
+                    {
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Acceso autorizado para: <strong>@Context.Session.GetString("UsuarioNombre")</strong>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Para acceder a todos los recursos, <a href="@Url.Action("Login", "Usuario")">inicia sesión</a>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmarAcceso()">
+                    <i class="fas fa-arrow-right me-2"></i>
+                    Continuar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function abrirRecursoVirtual(libroId, titulo) {
+            $('#tituloRecurso').text(titulo);
+            $('#modalRecursoVirtual').modal('show');
+        }
+
+        function confirmarAcceso() {
+            // Simulación de acceso al recurso
+            $('#modalRecursoVirtual').modal('hide');
+
+            // Mostrar mensaje de éxito
+            $('<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+              '<i class="fas fa-check-circle me-2"></i>' +
+              'Accediendo al recurso digital...' +
+              '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+              '</div>').prependTo('.main-container .container');
+
+            // Simular carga
+            setTimeout(function() {
+                alert('Recurso digital cargado exitosamente!\n\nEn una implementación real, aquí se abriría el visor de PDF, EPUB o se redirigiría al recurso externo.');
+            }, 1000);
+        }
+
+        $(document).ready(function() {
+            // Animación de aparición para las tarjetas
+            $('.book-card').each(function(index) {
+                $(this).delay(index * 100).queue(function() {
+                    $(this).addClass('fade-in').dequeue();
+                });
+            });
+        });
+    </script>
+}

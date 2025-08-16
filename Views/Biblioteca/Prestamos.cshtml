@@ -1,0 +1,258 @@
+﻿@model IEnumerable<BibliotecaWeb.Models.Prestamo>
+
+@{
+    ViewData["Title"] = "Gestión de Préstamos";
+}
+
+<div class="section-header fade-in">
+    <h1 class="section-title">
+        <i class="fas fa-exchange-alt me-3"></i>
+        Gestión de Préstamos
+    </h1>
+    <p class="section-subtitle">
+        Administra el estado de los préstamos y consulta la disponibilidad de libros
+    </p>
+</div>
+
+@if (Model.Any())
+{
+    <div class="prestamos-table fade-in">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-book me-2"></i>Libro</th>
+                        <th><i class="fas fa-user me-2"></i>Usuario</th>
+                        <th><i class="fas fa-calendar-alt me-2"></i>Fecha Préstamo</th>
+                        <th><i class="fas fa-calendar-check me-2"></i>Fecha Límite</th>
+                        <th><i class="fas fa-calendar-times me-2"></i>Fecha Devolución</th>
+                        <th><i class="fas fa-info-circle me-2"></i>Estado</th>
+                        <th><i class="fas fa-cogs me-2"></i>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var prestamo in Model)
+                    {
+                        <tr class="@(prestamo.Estado == "Vencido" ? "table-danger" : prestamo.Estado == "Prestado" ? "table-warning" : "table-success")">
+                            <td>
+                                <div>
+                                    <strong>@prestamo.Libro?.Titulo</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user-edit me-1"></i>@prestamo.Libro?.Autor
+                                        @if (prestamo.Libro?.TipoLibro == "Fisico")
+                                        {
+                                            <span class="badge bg-primary ms-2">
+                                                <i class="fas fa-book me-1"></i>Físico
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-info ms-2">
+                                                <i class="fas fa-tablet-alt me-1"></i>Virtual
+                                            </span>
+                                        }
+                                    </small>
+                                </div>
+                            </td>
+                            <td>
+                                <strong>@prestamo.Usuario?.Nombre</strong>
+                                <br>
+                                <small class="text-muted">@prestamo.Usuario?.Email</small>
+                            </td>
+                            <td>
+                                <i class="fas fa-calendar me-1 text-primary"></i>
+                                @prestamo.FechaPrestamo.ToString("dd/MM/yyyy")
+                                <br>
+                                <small class="text-muted">@prestamo.FechaPrestamo.ToString("HH:mm")</small>
+                            </td>
+                            <td>
+                                <i class="fas fa-clock me-1 @(prestamo.FechaLimite < DateTime.Now && prestamo.Estado == "Prestado" ? "text-danger" : "text-warning")"></i>
+                                @prestamo.FechaLimite.ToString("dd/MM/yyyy")
+                                @if (prestamo.FechaLimite < DateTime.Now && prestamo.Estado == "Prestado")
+                                {
+                                    <br><span class="badge bg-danger">Vencido</span>
+                                }
+                            </td>
+                            <td>
+                                @if (prestamo.FechaDevolucion.HasValue)
+                                {
+                                    <i class="fas fa-check-circle me-1 text-success"></i>
+                                    @prestamo.FechaDevolucion.Value.ToString("dd/MM/yyyy")
+                                    <br>
+                                    <small class="text-muted">@prestamo.FechaDevolucion.Value.ToString("HH:mm")</small>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        <i class="fas fa-minus-circle me-1"></i>
+                                        Pendiente
+                                    </span>
+                                }
+                            </td>
+                            <td>
+                                @switch (prestamo.Estado)
+                                {
+                                    case "Prestado":
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="fas fa-hand-holding me-1"></i>Prestado
+                                        </span>
+                                        break;
+                                    case "Devuelto":
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Devuelto
+                                        </span>
+                                        break;
+                                    case "Vencido":
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>Vencido
+                                        </span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                @if (Context.Session.GetString("UsuarioEmail") == "admin@biblioteca.com")
+                                {
+                                    <form asp-controller="Biblioteca" asp-action="ActualizarEstadoPrestamo" method="post" class="d-inline">
+                                        <input type="hidden" name="prestamoId" value="@prestamo.Id" />
+                                        <select name="nuevoEstado" class="estado-select form-select form-select-sm" onchange="this.form.submit()">
+                                            @{
+                                                var estados = new[] { "Prestado", "Devuelto", "Vencido" };
+                                                foreach (var estado in estados)
+                                                {
+                                                    <option value="@estado" selected="@(prestamo.Estado == estado)">@estado</option>
+                                                }
+                                            }
+                                        </select>
+                                    </form>
+                                }
+                                else
+                                {
+                                    @if (prestamo.Usuario?.Id.ToString() == Context.Session.GetString("UsuarioId"))
+                                    {
+                                        @if (prestamo.Estado == "Prestado")
+                                        {
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-clock me-1"></i>
+                                                @((prestamo.FechaLimite - DateTime.Now).Days) días restantes
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">-</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Sin acceso</span>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Resumen de préstamos -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Resumen de Préstamos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        @{
+                            var totalPrestamos = Model.Count();
+                            var prestamosActivos = Model.Count(p => p.Estado == "Prestado");
+                            var prestamosDevueltos = Model.Count(p => p.Estado == "Devuelto");
+                            var prestamosVencidos = Model.Count(p => p.Estado == "Vencido");
+                        }
+                        
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-list fa-2x text-primary mb-2"></i>
+                                <h4 class="text-primary">@totalPrestamos</h4>
+                                <p class="text-muted mb-0">Total Préstamos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-hand-holding fa-2x text-warning mb-2"></i>
+                                <h4 class="text-warning">@prestamosActivos</h4>
+                                <p class="text-muted mb-0">Activos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <h4 class="text-success">@prestamosDevueltos</h4>
+                                <p class="text-muted mb-0">Devueltos</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3">
+                                <i class="fas fa-exclamation-triangle fa-2x text-danger mb-2"></i>
+                                <h4 class="text-danger">@prestamosVencidos</h4>
+                                <p class="text-muted mb-0">Vencidos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="text-center py-5">
+        <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No hay préstamos registrados</h4>
+        <p class="text-muted">Los préstamos aparecerán aquí cuando los usuarios soliciten libros.</p>
+        <a href="@Url.Action("Fisica", "Biblioteca")" class="btn btn-primary mt-3">
+            <i class="fas fa-book me-2"></i>
+            Ver Biblioteca Física
+        </a>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Confirmar cambios de estado
+            $('.estado-select').on('change', function() {
+                var nuevoEstado = $(this).val();
+                var libro = $(this).closest('tr').find('td:first strong').text();
+                
+                if (!confirm('¿Está seguro de cambiar el estado del préstamo de "' + libro + '" a "' + nuevoEstado + '"?')) {
+                    // Revertir el cambio si el usuario cancela
+                    $(this).val($(this).data('original-value'));
+                    return false;
+                } else {
+                    // Mostrar indicador de carga
+                    $(this).closest('tr').addClass('loading');
+                }
+            });
+
+            // Guardar valores originales para poder revertir
+            $('.estado-select').each(function() {
+                $(this).data('original-value', $(this).val());
+            });
+
+            // Resaltar filas vencidas
+            $('tr.table-danger').each(function() {
+                $(this).find('td').css('animation', 'pulse 2s infinite');
+            });
+
+            // Animación de aparición
+            $('.prestamos-table').addClass('fade-in');
+        });
+
+        // CSS para la animación de pulso
+    </script>
+}

@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "Bienvenido";
+}
+
+<div class="welcome-section fade-in">
+    <h1 class="welcome-title">
+        <i class="fas fa-book-reader me-3"></i>
+        Bienvenido a Biblioteca Web
+    </h1>
+    <p class="welcome-subtitle">
+        Tu portal de acceso a miles de recursos bibliográficos digitales y físicos
+    </p>
+    <div class="text-center mt-4">
+        <i class="fas fa-quote-left text-muted me-2"></i>
+        <em>"Un libro abierto es un cerebro que habla; cerrado, un amigo que espera; olvidado, un alma que perdona; destruido, un corazón que llora."</em>
+        <i class="fas fa-quote-right text-muted ms-2"></i>
+    </div>
+</div>
+
+<div class="menu-buttons fade-in">
+    <a href="@Url.Action("Virtual", "Biblioteca")" class="menu-btn">
+        <i class="fas fa-tablet-alt"></i>
+        <h4>Biblioteca Virtual</h4>
+        <p>Accede a nuestra colección digital de e-libros, recursos online y bibliotecas públicas digitales</p>
+    </a>
+
+    <a href="@Url.Action("Fisica", "Biblioteca")" class="menu-btn">
+        <i class="fas fa-book"></i>
+        <h4>Biblioteca Física</h4>
+        <p>Explora nuestro catálogo de libros físicos organizados por categorías: Literatura, Técnicos y General</p>
+    </a>
+
+    <a href="@Url.Action("Prestamos", "Biblioteca")" class="menu-btn">
+        <i class="fas fa-exchange-alt"></i>
+        <h4>Préstamos</h4>
+        <p>Gestiona tus préstamos activos, consulta estados de disponibilidad y historial de préstamos</p>
+    </a>
+
+    <a href="@Url.Action("Login", "Usuario")" class="menu-btn">
+        <i class="fas fa-users"></i>
+        <h4>Usuarios</h4>
+        <p>Inicia sesión, registra una nueva cuenta o gestiona tu perfil de usuario</p>
+    </a>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="text-center p-4">
+            <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+            <h5>Disponible 24/7</h5>
+            <p>Acceso a recursos digitales en cualquier momento</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="text-center p-4">
+            <i class="fas fa-search fa-3x text-primary mb-3"></i>
+            <h5>Búsqueda Avanzada</h5>
+            <p>Encuentra rápidamente el contenido que necesitas</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="text-center p-4">
+            <i class="fas fa-mobile-alt fa-3x text-primary mb-3"></i>
+            <h5>Multiplataforma</h5>
+            <p>Compatible con todos tus dispositivos</p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Animación de aparición secuencial para las tarjetas del menú
+            $('.menu-btn').each(function(index) {
+                $(this).delay(index * 200).queue(function() {
+                    $(this).addClass('fade-in').dequeue();
+                });
+            });
+        });
+    </script>
+}

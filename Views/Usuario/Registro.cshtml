@@ -1,0 +1,262 @@
+﻿@model BibliotecaWeb.Models.RegistroViewModel
+
+@{
+    ViewData["Title"] = "Crear Cuenta";
+}
+
+<div class="auth-container fade-in">
+    <div class="auth-header">
+        <i class="fas fa-user-plus fa-2x mb-3"></i>
+        <h2>Crear Cuenta Nueva</h2>
+        <p>Regístrate para acceder a todos los servicios de la biblioteca</p>
+    </div>
+
+    <div class="auth-body">
+        <form asp-action="Registro" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Nombre" class="form-label">
+                    <i class="fas fa-user me-2"></i>Nombre Completo
+                </label>
+                <input asp-for="Nombre" class="form-control" placeholder="Ingrese su nombre completo" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email" class="form-label">
+                    <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                </label>
+                <input asp-for="Email" class="form-control" placeholder="Ingrese su email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Contraseña
+                </label>
+                <div class="input-group">
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Ingrese su contraseña" id="passwordInput" />
+                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+                <small class="text-muted">La contraseña debe tener al menos 6 caracteres</small>
+                <span asp-validation-for="Password" class="text-danger"></span>
+                <div class="password-strength mt-2" id="passwordStrength" style="display: none;">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="strength-text text-muted"></small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ConfirmarPassword" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Confirmar Contraseña
+                </label>
+                <input asp-for="ConfirmarPassword" type="password" class="form-control" placeholder="Confirme su contraseña" id="confirmPasswordInput" />
+                <span asp-validation-for="ConfirmarPassword" class="text-danger"></span>
+                <div class="password-match mt-2" id="passwordMatch" style="display: none;">
+                    <small class="text-muted">
+                        <i class="fas fa-times text-danger" id="matchIcon"></i>
+                        <span id="matchText">Las contraseñas no coinciden</span>
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="acceptTerms" required />
+                <label class="form-check-label" for="acceptTerms">
+                    Acepto los <a href="#" data-bs-toggle="modal" data-bs-target="#modalTerminos">términos y condiciones</a>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="submitBtn" disabled>
+                <i class="fas fa-user-plus me-2"></i>
+                Crear Cuenta
+            </button>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+            <p class="text-muted">¿Ya tienes una cuenta?</p>
+            <a href="@Url.Action("Login", "Usuario")" class="btn btn-outline-primary">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Iniciar Sesión
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Términos y Condiciones -->
+<div class="modal fade" id="modalTerminos" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-contract me-2"></i>
+                    Términos y Condiciones
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <h6>1. Uso del Sistema</h6>
+                <p>El sistema de biblioteca web está destinado únicamente para fines educativos y de investigación.</p>
+
+                <h6>2. Responsabilidades del Usuario</h6>
+                <p>Los usuarios son responsables de:</p>
+                <ul>
+                    <li>Mantener la confidencialidad de sus credenciales</li>
+                    <li>Devolver los libros en las fechas establecidas</li>
+                    <li>Reportar cualquier daño en los materiales</li>
+                </ul>
+
+                <h6>3. Préstamos</h6>
+                <p>Los préstamos tienen un período máximo de 15 días calendario. Las renovaciones están sujetas a disponibilidad.</p>
+
+                <h6>4. Sanciones</h6>
+                <p>El retraso en la devolución de materiales puede resultar en suspensión temporal del servicio.</p>
+
+                <h6>5. Privacidad</h6>
+                <p>Los datos personales se utilizan únicamente para la gestión del servicio bibliotecario.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="$('#acceptTerms').prop('checked', true).trigger('change')">
+                    <i class="fas fa-check me-2"></i>
+                    Acepto los Términos
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $(document).ready(function() {
+            // Toggle para mostrar/ocultar contraseña
+            $('#togglePassword').click(function() {
+                var passwordField = $('#passwordInput');
+                var toggleIcon = $('#toggleIcon');
+
+                if (passwordField.attr('type') === 'password') {
+                    passwordField.attr('type', 'text');
+                    toggleIcon.removeClass('fa-eye').addClass('fa-eye-slash');
+                } else {
+                    passwordField.attr('type', 'password');
+                    toggleIcon.removeClass('fa-eye-slash').addClass('fa-eye');
+                }
+            });
+
+            // Validación de fortaleza de contraseña
+            $('#passwordInput').on('input', function() {
+                var password = $(this).val();
+                var strength = 0;
+                var strengthText = '';
+                var strengthColor = '';
+
+                if (password.length >= 6) strength += 25;
+                if (password.match(/[a-z]/)) strength += 25;
+                if (password.match(/[A-Z]/)) strength += 25;
+                if (password.match(/[0-9]/)) strength += 25;
+
+                if (strength <= 25) {
+                    strengthText = 'Débil';
+                    strengthColor = 'bg-danger';
+                } else if (strength <= 50) {
+                    strengthText = 'Regular';
+                    strengthColor = 'bg-warning';
+                } else if (strength <= 75) {
+                    strengthText = 'Buena';
+                    strengthColor = 'bg-info';
+                } else {
+                    strengthText = 'Excelente';
+                    strengthColor = 'bg-success';
+                }
+
+                if (password.length > 0) {
+                    $('#passwordStrength').show();
+                    $('#passwordStrength .progress-bar')
+                        .removeClass('bg-danger bg-warning bg-info bg-success')
+                        .addClass(strengthColor)
+                        .css('width', strength + '%');
+                    $('#passwordStrength .strength-text').text(strengthText);
+                } else {
+                    $('#passwordStrength').hide();
+                }
+
+                checkPasswordMatch();
+            });
+
+            // Validación de coincidencia de contraseñas
+            $('#confirmPasswordInput').on('input', checkPasswordMatch);
+
+            function checkPasswordMatch() {
+                var password = $('#passwordInput').val();
+                var confirmPassword = $('#confirmPasswordInput').val();
+
+                if (confirmPassword.length > 0) {
+                    $('#passwordMatch').show();
+                    if (password === confirmPassword) {
+                        $('#matchIcon').removeClass('fa-times text-danger').addClass('fa-check text-success');
+                        $('#matchText').text('Las contraseñas coinciden').removeClass('text-danger').addClass('text-success');
+                    } else {
+                        $('#matchIcon').removeClass('fa-check text-success').addClass('fa-times text-danger');
+                        $('#matchText').text('Las contraseñas no coinciden').removeClass('text-success').addClass('text-danger');
+                    }
+                } else {
+                    $('#passwordMatch').hide();
+                }
+
+                checkFormValidity();
+            }
+
+            // Validar términos y condiciones
+            $('#acceptTerms').change(checkFormValidity);
+
+            function checkFormValidity() {
+                var password = $('#passwordInput').val();
+                var confirmPassword = $('#confirmPasswordInput').val();
+                var termsAccepted = $('#acceptTerms').is(':checked');
+                var passwordsMatch = password === confirmPassword && password.length >= 6;
+
+                $('#submitBtn').prop('disabled', !(passwordsMatch && termsAccepted));
+            }
+
+            // Efecto de focus en los campos
+            $('.form-control').focus(function() {
+                $(this).closest('.form-group').addClass('focused');
+            }).blur(function() {
+                $(this).closest('.form-group').removeClass('focused');
+            });
+        });
+    </script>
+
+    <style>
+        .form-group.focused label {
+            color: var(--primary-color);
+        }
+
+        .form-group.focused .form-control {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(44, 90, 160, 0.25);
+        }
+
+        .progress {
+            height: 5px;
+        }
+
+        #submitBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+}

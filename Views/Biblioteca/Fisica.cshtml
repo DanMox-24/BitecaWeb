@@ -1,0 +1,243 @@
+﻿@model IEnumerable<IGrouping<string, BibliotecaWeb.Models.Libro>>
+
+@{
+    ViewData["Title"] = "Biblioteca Física";
+}
+
+<div class="section-header fade-in">
+    <h1 class="section-title">
+        <i class="fas fa-book me-3"></i>
+        Biblioteca Física
+    </h1>
+    <p class="section-subtitle">
+        Descubre nuestra extensa colección de libros físicos organizados por categorías
+    </p>
+</div>
+
+@foreach (var grupo in Model)
+{
+    <div class="category-section fade-in">
+        @{
+            var iconoCategoria = "";
+            var descripcionCategoria = "";
+            var colorCategoria = "";
+            switch (grupo.Key)
+            {
+                case "Literatura":
+                    iconoCategoria = "fas fa-feather-alt";
+                    descripcionCategoria = "Obras literarias, novelas, poesía y clásicos universales";
+                    colorCategoria = "text-primary";
+                    break;
+                case "Tecnicos":
+                    iconoCategoria = "fas fa-cogs";
+                    descripcionCategoria = "Libros técnicos, programación, ingeniería y ciencias aplicadas";
+                    colorCategoria = "text-success";
+                    break;
+                case "General":
+                    iconoCategoria = "fas fa-globe-americas";
+                    descripcionCategoria = "Conocimiento general, historia, filosofía y ciencias sociales";
+                    colorCategoria = "text-warning";
+                    break;
+                default:
+                    iconoCategoria = "fas fa-book";
+                    descripcionCategoria = "Colección diversa de libros físicos";
+                    colorCategoria = "text-info";
+                    break;
+            }
+        }
+
+        <h2 class="category-title">
+            <i class="@iconoCategoria @colorCategoria"></i>
+            @grupo.Key
+            <small class="text-muted">(@grupo.Count() libros)</small>
+        </h2>
+        <p class="text-muted mb-4">@descripcionCategoria</p>
+
+        <div class="row">
+            @foreach (var libro in grupo)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="book-card">
+                        <div class="book-image">
+                            @if (!string.IsNullOrEmpty(libro.ImagenUrl))
+                            {
+                                <img src="@libro.ImagenUrl" alt="@libro.Titulo" class="img-fluid" style="width: 100%; height: 200px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <i class="@iconoCategoria"></i>
+                            }
+                        </div>
+                        <div class="book-content">
+                            <h5 class="book-title">@libro.Titulo</h5>
+                            <p class="book-author">
+                                <i class="fas fa-user me-2"></i>@libro.Autor
+                            </p>
+
+                            @if (!string.IsNullOrEmpty(libro.ISBN))
+                            {
+                                <p class="text-muted small">
+                                    <i class="fas fa-barcode me-2"></i>ISBN: @libro.ISBN
+                                </p>
+                            }
+
+                            @if (libro.Categoria != null)
+                            {
+                                <span class="book-category">@libro.Categoria.Nombre</span>
+                            }
+
+                            @if (!string.IsNullOrEmpty(libro.Descripcion))
+                            {
+                                <p class="mt-3 text-muted">
+                                    @if (libro.Descripcion.Length > 100)
+                                    {
+                                        @(libro.Descripcion.Substring(0, 100) + "...")
+                                    }
+                                    else
+                                    {
+                                        @libro.Descripcion
+                                    }
+                                </p>
+                            }
+
+                            <div class="mt-3 d-flex justify-content-between align-items-center">
+                                @if (libro.CantidadDisponible > 0)
+                                {
+                                    <span class="book-status status-disponible">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Disponible (@libro.CantidadDisponible de @libro.CantidadTotal)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="book-status status-prestado">
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        No disponible
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="mt-3 d-flex gap-2">
+                                @if (libro.CantidadDisponible > 0)
+                                {
+                                    @if (Context.Session.GetString("UsuarioId") != null)
+                                    {
+                                        <form asp-controller="Biblioteca" asp-action="SolicitarPrestamo" method="post" style="display: inline;">
+                                            <input type="hidden" name="libroId" value="@libro.Id" />
+                                            <button type="submit" class="btn btn-success btn-sm">
+                                                <i class="fas fa-hand-holding me-2"></i>
+                                                Solicitar
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("Login", "Usuario")" class="btn btn-success btn-sm">
+                                            <i class="fas fa-sign-in-alt me-2"></i>
+                                            Iniciar Sesión
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="fas fa-clock me-2"></i>
+                                        No Disponible
+                                    </button>
+                                }
+
+                                <a href="@Url.Action("DetalleLibro", "Biblioteca", new { id = libro.Id })" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="text-center py-5">
+        <i class="fas fa-book fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No hay libros físicos disponibles</h4>
+        <p class="text-muted">La colección física estará disponible próximamente.</p>
+    </div>
+}
+
+<!-- Estadísticas de la colección -->
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Estadísticas de la Colección
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    @{
+                        var totalLibros = Model.SelectMany(g => g).Sum(l => l.CantidadTotal);
+                        var librosDisponibles = Model.SelectMany(g => g).Sum(l => l.CantidadDisponible);
+                        var librosPrestados = totalLibros - librosDisponibles;
+                        var porcentajeDisponible = totalLibros > 0 ? (librosDisponibles * 100.0 / totalLibros) : 0;
+                    }
+
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <i class="fas fa-books fa-2x text-primary mb-2"></i>
+                            <h4 class="text-primary">@totalLibros</h4>
+                            <p class="text-muted mb-0">Total de Ejemplares</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                            <h4 class="text-success">@librosDisponibles</h4>
+                            <p class="text-muted mb-0">Disponibles</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <i class="fas fa-hand-holding fa-2x text-warning mb-2"></i>
+                            <h4 class="text-warning">@librosPrestados</h4>
+                            <p class="text-muted mb-0">En Préstamo</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3">
+                            <i class="fas fa-percentage fa-2x text-info mb-2"></i>
+                            <h4 class="text-info">@porcentajeDisponible.ToString("F1")%</h4>
+                            <p class="text-muted mb-0">Disponibilidad</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Animación de aparición para las tarjetas
+            $('.book-card').each(function(index) {
+                $(this).delay(index * 100).queue(function() {
+                    $(this).addClass('fade-in').dequeue();
+                });
+            });
+
+            // Confirmación para solicitar préstamo
+            $('form[asp-action="SolicitarPrestamo"]').on('submit', function(e) {
+                var titulo = $(this).closest('.book-card').find('.book-title').text();
+                if (!confirm('¿Está seguro de que desea solicitar el préstamo del libro "' + titulo + '"?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+}
