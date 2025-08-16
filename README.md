@@ -109,22 +109,17 @@ La aplicación estará disponible en:
 ### 🔐 **Sistema de Autenticación**
 ![Pantalla de Inicio de Sesión](screenshots/login.png)
 
-![Registro de Usuarios](screenshots/registro.png)
-
 ### 🏠 **Página Principal**
 ![Página de Inicio](screenshots/inicio.png)
 
 ### 📚 **Biblioteca Física**
 ![Catálogo de Libros Físicos](screenshots/fisica.png)
 
-### 💻 **Biblioteca Virtual**
-![Recursos Digitales](screenshots/virtual.png)
-
 ### 📋 **Gestión de Préstamos**
 ![Sistema de Préstamos](screenshots/prestamos.png)
 
-### 👥 **Gestión de Usuarios**
-![Panel de Usuarios](screenshots/usuarios.png)
+### 💻 **Biblioteca Virtual**
+![Recursos Digitales](screenshots/virtual.png)
 
 ## 🎨 Características de Diseño
 
