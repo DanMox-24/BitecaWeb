@@ -106,13 +106,11 @@ La aplicación estará disponible en:
 
 ## 📸 Capturas de la Interfaz
 
-<!-- Aquí puedes agregar las capturas de pantalla de tu aplicación -->
-<!-- Ejemplo de uso: -->
-<!-- ![Página de Inicio](screenshots/inicio.png) -->
-<!-- ![Biblioteca Virtual](screenshots/virtual.png) -->
-<!-- ![Catálogo Físico](screenshots/fisica.png) -->
-<!-- ![Gestión de Préstamos](screenshots/prestamos.png) -->
-<!-- ![Login de Usuarios](screenshots/login.png) -->
+[Página de Inicio](screenshots/inicio.png)
+[Biblioteca Virtual](screenshots/virtual.png)
+[Catálogo Físico](screenshots/fisica.png)
+[Gestión de Préstamos](screenshots/prestamos.png)
+[Login de Usuarios](screenshots/login.png)
 
 ## 🎨 Características de Diseño
 
