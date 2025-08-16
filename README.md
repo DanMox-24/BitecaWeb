@@ -106,11 +106,25 @@ La aplicación estará disponible en:
 
 ## 📸 Capturas de la Interfaz
 
+### 🔐 **Sistema de Autenticación**
+![Pantalla de Inicio de Sesión](screenshots/login.png)
+
+![Registro de Usuarios](screenshots/registro.png)
+
+### 🏠 **Página Principal**
 ![Página de Inicio](screenshots/inicio.png)
-![Biblioteca Virtual](screenshots/virtual.png)
-![Catálogo Físico](screenshots/fisica.png)
-![Gestión de Préstamos](screenshots/prestamos.png)
-![Login de Usuarios](screenshots/login.png)
+
+### 📚 **Biblioteca Física**
+![Catálogo de Libros Físicos](screenshots/fisica.png)
+
+### 💻 **Biblioteca Virtual**
+![Recursos Digitales](screenshots/virtual.png)
+
+### 📋 **Gestión de Préstamos**
+![Sistema de Préstamos](screenshots/prestamos.png)
+
+### 👥 **Gestión de Usuarios**
+![Panel de Usuarios](screenshots/usuarios.png)
 
 ## 🎨 Características de Diseño
 
